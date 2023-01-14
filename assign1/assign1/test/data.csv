@@ -1,0 +1,4 @@
+Lexeme,Token,Count
+program,Keyword,1
+example,Identifier,1
+output,Identifier,1
