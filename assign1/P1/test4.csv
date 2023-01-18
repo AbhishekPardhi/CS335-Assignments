@@ -41,8 +41,8 @@ sum,Identifier,1
 ac,Identifier,1
 array,Keyword,3
 [,Separator,3
-1.,Literal,3
-.,Operator,3
+1,Literal,3
+..,Separator,3
 10,Literal,2
 ],Separator,3
 of,Keyword,3

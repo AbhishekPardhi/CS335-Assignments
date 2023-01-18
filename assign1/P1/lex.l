@@ -3,10 +3,9 @@
     using namespace std;
 
     vector<string> tokenTable{"Keyword","Identifier","Separator","Operator","Literal"};
-    vector<string> errorTable{"Nested comment found."};
+    vector<string> errorTable{"Nested comment found.","Decimal numbers must have a digit before decimal."};
     unordered_map<string, vector<int>> table;
     int lexemeCount;
-    int num_lines;
     char*file;
 
     void AddLexeme(string lexeme,int token);
@@ -15,25 +14,26 @@
 
     void PrintData();
     
-    void ReportError(int index, int lineNumber);
+    void ReportError(int index);
 %}
 
 TYPE int|char|bool|float
 DIGIT [0-9]
-ID [a-z][a-z0-9]*
+ID [a-zA-Z][a-zA-Z0-9]*
+ERROR {ID}"."
 
 %%
-\n {num_lines++;}
-"{"[^{\n]*"{" {ReportError(0,num_lines);PrintData();return 0;}
+\n { yylineno++; }
+{ERROR} {ReportError(1);PrintData();return 0;}
+"{"[^{\n]*"{" {ReportError(0);PrintData();return 0;}
 "{"[^{}}]*"}" /* eat up comments */
 "array"|"begin"|"case"|"const"|"do"|"downto"|"else"|"end"|"file"|"for"|"function"|"goto"|"if"|"label"|"nil"|"of"|"packed"|"procedure"|"program"|"record"|"repeat"|"set"|"then"|"to"|"type"|"until"|"var"|"while"|"with" AddLexeme(strdup(yytext),0);
 "add"|"or"|"not"|"div"|"mod"|"in" AddLexeme(strdup(yytext),3);
 {ID} AddLexeme(strdup(yytext),1);
 "-"?{DIGIT}+ AddLexeme(strdup(yytext),4);
-"-"?{DIGIT}+"."{DIGIT}* AddLexeme(strdup(yytext),4);
-"+"|"-"|"*"|"/"|"."|":="|"="|"<>"|"<"|"<="|">="|">"|"^" AddLexeme(strdup(yytext),3);
+"-"?{DIGIT}+"."{DIGIT}+ AddLexeme(strdup(yytext),4);
 ","|";"|":"|"("|")"|"["|"]"|".." AddLexeme(strdup(yytext),2);
-
+"+"|"-"|"*"|"/"|"."|":="|"="|"<>"|"<"|"<="|">="|">"|"^" AddLexeme(strdup(yytext),3);
 . /*Don't print*/;
 %%
 
@@ -74,14 +74,13 @@ void PrintData()
     fout.close();
 }
 
-void ReportError(int index, int lineNumber)
+void ReportError(int index)
 {
-    cout << "\033[31mCompilation error at line no." << lineNumber << ": " << errorTable[index] << endl;
+    cout << "\033[31mCompilation error at line no." << yylineno << ": " << errorTable[index] << endl;
 }
 
 int main(int argc, char*argv[]){
     lexemeCount=0;
-    num_lines=1;
     file=argv[1];
     yylex();
     PrintData();

@@ -26,4 +26,16 @@ x,Identifier,2
 i,Identifier,2
 begin,Keyword,1
 :=,Operator,3
-.,Operator,3
+.re;
+  d.re := c.im;
+  i := blue
+end
+,Operator,1
+.re := c.im;
+  i := blue
+end
+,Operator,1
+.im;
+  i := blue
+end
+,Operator,1
