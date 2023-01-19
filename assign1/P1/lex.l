@@ -40,6 +40,7 @@ LITERAL [-]?{DIGIT}+|[-]?{DIGIT}+"."{DIGIT}+
 {ID} AddLexeme(strdup(yytext),IDENTIFIER);
 {LITERAL} AddLexeme(strdup(yytext),LITERAL);
 {SEPARATOR} AddLexeme(strdup(yytext),SEPARATOR);
+{STRING} AddLexeme(strdup(yytext),LITERAL);
 . /*Couldn't recognize lexeme*/;
 %%
 

@@ -8,6 +8,3 @@ begin
        5 = 3-2;
    writelnf(x)
 end
-{awd
-
-}
