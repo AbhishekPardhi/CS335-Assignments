@@ -15,9 +15,9 @@ i,Identifier,2
 integer,Identifier,1
 begin,Keyword,1
 :=,Operator,4
-.,Operator,2
-2,Literal,1
+3.2,Literal,1
 a,Identifier,1
+.,Operator,1
 b,Identifier,1
 for,Keyword,1
 1,Literal,1
