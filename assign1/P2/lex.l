@@ -17,36 +17,107 @@
     
     void ReportError(int index);
 %}
-
+/*#############################*/
+LineTerminator "0x0A"|"0x0D"|"0x0A""0x0D"
+WhiteSpace " "|"\t"|"\f"|{LineTerminator}
+/*#############################*/
+EndOfLineComment "//""[.]*
+NotStarNotSlash [^*/]|{LineTerminator}
+NotStar [^*]|{LineTerminator}
+CommentTailStar [/]|([*]{CommentTailStar})|{NotStarNotSlash}{CommentTail}
+CommentTail ([*]{CommentTailStar})|({NotStar}{CommentTail})
+TraditionalComment "/*"{CommentTail}
+Comment {TraditionalComment}|{EndOfLineComment}
+/*#############################*/
+JavaLetter [a-zA-Z_]
+JavaLetterOrDigit [a-zA-Z0-9_]
+IdentifierChars {JavaLetter}{JavaLetterOrDigit}*
+Identifier {IdentifierChars}
+/*#############################*/
 ReservedKeyword "abstract"|"continue"|"for"|"new"|"switch"|"assert"|"default"|"if"|"package"|"synchronized"|"boolean"|"do"|"goto"|"private"|"this"|"break"|"double"|"implements"|"protected"|"throw"|"byte"|"else"|"import"|"public"|"throws"|"case"|"enum"|"instanceof"|"return"|"transient"|"catch"|"extends"|"int"|"short"|"try"|"char"|"final"|"interface"|"static"|"void"|"class"|"finally"|"long"|"strictfp"|"volatile"|"const"|"float"|"native"|"super"|"while"
 ContextualKeyword "exports"|"opens"|"requires"|"uses"|"module"|"permits"|"sealed"|"var"|"non-sealed"|"provides"|"to"|"with"|"open"|"record"|"transitive"|"yield"
-
 Keyword {ReservedKeyword}|{ContextualKeyword}
-
+/*#############################*/
 NonZeroDigit [1-9]
 Digit [0-9]
 Underscores [_]+
 DigitOrUnderscore {Digit}|[_]
 DigitsAndUnderscores {DigitOrUnderscore}+
-Digits {Digit}|({Digit}{DigitsAndUnderscores}{Digit})
-
-DecimalNumeral ({NonZeroDigit}{Digits})|({NonZeroDigit}{Underscores}{Digits})
-DecimalIntegerLiteral ({DecimalNumeral}{IntegerTypeSuffix})
-HexIntegerLiteral ({HexNumeral}{IntegerTypeSuffix})
-OctalIntegerLiteral ({OctalNumeral}{IntegerTypeSuffix})
-BinaryIntegerLiteral ({BinaryNumeral}{IntegerTypeSuffix})
+Digits {Digit}?|({Digit}{DigitsAndUnderscores}?{Digit})
+DecimalNumeral [0]|({NonZeroDigit}{Digits}?)|({NonZeroDigit}{Underscores}{Digits})
 IntegerTypeSuffix [lL]
-
+DecimalIntegerLiteral ({DecimalNumeral}{IntegerTypeSuffix}?)
+/*-----------------------------*/
+HexDigit [0-9a-fA-F]
+HexDigitOrUnderscore {HexDigit}|[_]
+HexDigitsAndUnderscores {HexDigitOrUnderscore}+
+HexDigits {HexDigit}|({HexDigit}{HexDigitsAndUnderscores}{HexDigit})
+HexNumeral ("0x"{HexDigits})|("0X"{HexDigits})
+HexIntegerLiteral ({HexNumeral}{IntegerTypeSuffix}?)
+/*-----------------------------*/
+OctalDigit [0-7]
+OctalDigitOrUnderscore {OctalDigit}|[_]
+OctalDigitsAndUnderscores {OctalDigitOrUnderscore}+
+OctalDigits {OctalDigit}|({OctalDigit}{OctalDigitsAndUnderscores}?{OctalDigit})
+OctalNumeral ("0"{OctalDigits})|("0"{Underscores}{OctalDigits})
+OctalIntegerLiteral ({OctalNumeral}{IntegerTypeSuffix}?)
+/*-----------------------------*/
+BinaryDigit [01]
+BinaryDigitOrUnderscore {BinaryDigit}|[_]
+BinaryDigitsAndUnderscores {BinaryDigitOrUnderscore}+
+BinaryDigits {BinaryDigit}|({BinaryDigit}{BinaryDigitsAndUnderscores}?{BinaryDigit})
+BinaryNumeral ("0b"{BinaryDigits})|("0B"{BinaryDigits})
+BinaryIntegerLiteral ({BinaryNumeral}{IntegerTypeSuffix}?)
+/*-----------------------------*/
 IntegerLiteral {DecimalIntegerLiteral}|{HexIntegerLiteral}|{OctalIntegerLiteral}|{BinaryIntegerLiteral}
-
-Literal = {IntegerLiteral}
+/*-----------------------------*/
+FloatTypeSuffix [fFdD]
+Sign [+-]
+SignedInteger {Sign}?{Digits}
+ExponentIndicator [eE]
+ExponentPart {ExponentIndicator}{SignedInteger}
+DecimalFloatingPointLiteral ({Digits}[.]{Digits}?{ExponentPart}?{FloatTypeSuffix}?)|([.]{Digits}{ExponentPart}?{FloatTypeSuffix}?)|({Digits}{ExponentPart}{FloatTypeSuffix}?)|({Digits}{ExponentPart}?{FloatTypeSuffix})
+/*-----------------------------*/
+BinaryExponentIndicator [pP]
+BinaryExponent {BinaryExponentIndicator}{SignedInteger}
+HexSignificand ({HexNumeral}[.]?)|("0x"{HexDigits}?[.]{HexDigits})|("0X"{HexDigits}?[.]{HexDigits})
+HexadecimalFloatingPointLiteral {HexSignificand}{BinaryExponent}{FloatTypeSuffix}?
+/*-----------------------------*/
+FloatingPointLiteral {DecimalFloatingPointLiteral}|{HexadecimalFloatingPointLiteral}
+/*-----------------------------*/
+BooleanLiteral true|false
+/*-----------------------------*/
+SingleCharacter [^\"\]
+CharacterLiteral ([']{SingleCharacter}['])
+ZeroToThree [0-3]
+OctalDigit [0-7]
+OctalEscape ([\]{OctalDigit})|([\]{OctalDigit}{OctalDigit})|([\]{ZeroToThree}{OctalDigit}{OctalDigit})
+/*-----------------------------*/
+StringCharacter [^\'\n]|{EscapeSequence}
+StringLiteral ["]{StringCharacter}*["]
+/*-----------------------------*/
+TextBlockCharacter [^\\]|{EscapeSequence}|{LineTerminator}
+TextBlockWhiteSpace " "|"\t"|"\f"
+TextBlock [\"]{3}{TextBlockWhiteSpace}*{LineTerminator}{TextBlockCharacter}*[\"]{3}
+/*-----------------------------*/
+NullLiteral null
+/*-----------------------------*/
+Literal {IntegerLiteral}|{FloatingPointLiteral}|{BooleanLiteral}|{CharacterLiteral}|{StringLiteral}|{TextBlock}|{NullLiteral}
+/*#############################*/
+Separator "\("|"\)"|"\{"|"\}"|"\["|"\]"|";"|","|"."|"..."|"@"|"::"
+/*#############################*/
+Operator "="|">"|"<"|"!"|"~"|"?"|":"|"->"|"=="|">="|"<="|"!="|"&&"|"||"|"++"|"--"|"+"|"-"|"*"|"/"|"&"|"|"|"^"|"%"|"<<"|">>"|">>>"|"+="|"-="|"*="|"/="|"&="|"|="|"^="|"%="|"<<="|">>="|">>>="
+/*#############################*/
 
 %x COMMENT
 %%
 \n { yylineno++; }
 {Keyword} AddLexeme(strdup(yytext),KEYWORD);
 {Literal} AddLexeme(strdup(yytext),LITERAL);
-. /*Couldn't recognize lexeme*/;
+{Separator} AddLexeme(strdup(yytext),SEPARATOR);
+{Operator} AddLexeme(strdup(yytext),OPERATOR);
+{Identifier} AddLexeme(strdup(yytext),IDENTIFIER);
+. /*{cout << yytext << endl;}*/
 %%
 
 void AddLexeme(string lexeme,int token)

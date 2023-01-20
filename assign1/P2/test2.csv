@@ -1,0 +1,10 @@
+Lexeme,Token,Count
+public,Keyword,2
+class,Keyword,1
+static,Keyword,4
+void,Keyword,4
+int,Keyword,11
+float,Keyword,3
+to,Keyword,1
+long,Keyword,2
+100L,Literal,1

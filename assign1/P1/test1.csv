@@ -15,7 +15,8 @@ i,Identifier,2
 integer,Identifier,1
 begin,Keyword,1
 :=,Operator,4
-3.2,Literal,1
+3,Literal,2
+-2,Literal,2
 a,Identifier,1
 .,Operator,1
 b,Identifier,1
@@ -29,7 +30,5 @@ do,Keyword,1
 +,Operator,1
 /,Operator,1
 =,Operator,1
-3,Literal,1
--2,Literal,1
 writelnf,Identifier,1
 end,Keyword,1

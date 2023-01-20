@@ -23,7 +23,7 @@ DIGIT [0-9]
 ID [a-zA-Z][a-zA-Z0-9]*
 ERROR ^{ID}"."
 OPERATOR "+"|"-"|"*"|"/"|"."|":="|"="|"<>"|"<"|"<="|">="|">"|"^"|"add"|"or"|"not"|"div"|"mod"|"in"
-STRING \"[^\n"]+\"
+STRING \"[^\"]+\"
 KEYWORD "array"|"begin"|"case"|"const"|"do"|"downto"|"else"|"end"|"file"|"for"|"function"|"goto"|"if"|"label"|"nil"|"of"|"packed"|"procedure"|"program"|"record"|"repeat"|"set"|"then"|"to"|"type"|"until"|"var"|"while"|"with"
 SEPARATOR ","|";"|":"|"("|")"|"["|"]"|".."
 LITERAL [-]?{DIGIT}+|[-]?{DIGIT}+"."{DIGIT}+
@@ -34,6 +34,7 @@ LITERAL [-]?{DIGIT}+|[-]?{DIGIT}+"."{DIGIT}+
 [^a-zA-Z0-9]\. {ReportError(0);PrintData();return 0;}
 "{" {BEGIN(COMMENT);cout << "comment starts at " << yylineno << endl;}
 <COMMENT>[^}\n]* { /* ignore everything within the comment */ }
+<COMMENT>[\n] {yylineno++;}
 <COMMENT>"}" {cout << "comment ends at " << yylineno << endl;BEGIN(INITIAL);}
 {KEYWORD} AddLexeme(strdup(yytext),KEYWORD);
 {OPERATOR} AddLexeme(strdup(yytext),OPERATOR);

@@ -10,7 +10,4 @@ int main()
         cin >> str;
         cout  << "\"" << str << "\"|";
     }
-    int c=3;
-    int a = -c;
-    cout << a << endl;
 }
