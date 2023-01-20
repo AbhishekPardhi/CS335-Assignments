@@ -21,13 +21,13 @@
 LineTerminator "0x0A"|"0x0D"|"0x0A""0x0D"
 WhiteSpace " "|"\t"|"\f"|{LineTerminator}
 /*#############################*/
-EndOfLineComment "//""[.]*
+EndOfLineComment "//"[^\n]*
 NotStarNotSlash [^*/]|{LineTerminator}
 NotStar [^*]|{LineTerminator}
-CommentTailStar [/]|([*]{CommentTailStar})|{NotStarNotSlash}{CommentTail}
-CommentTail ([*]{CommentTailStar})|({NotStar}{CommentTail})
+CommentTailStar [//]|([*]{CommentTailStar})|({NotStarNotSlash}{CommentTail})
+CommentTail ({NotStar}{CommentTail})
 TraditionalComment "/*"{CommentTail}
-Comment {TraditionalComment}|{EndOfLineComment}
+Comment "/*"[^"*/"]"*/"
 /*#############################*/
 JavaLetter [a-zA-Z_]
 JavaLetterOrDigit [a-zA-Z0-9_]
@@ -87,16 +87,13 @@ FloatingPointLiteral {DecimalFloatingPointLiteral}|{HexadecimalFloatingPointLite
 /*-----------------------------*/
 BooleanLiteral true|false
 /*-----------------------------*/
-SingleCharacter [^\"\]
-CharacterLiteral ([']{SingleCharacter}['])
-ZeroToThree [0-3]
-OctalDigit [0-7]
-OctalEscape ([\]{OctalDigit})|([\]{OctalDigit}{OctalDigit})|([\]{ZeroToThree}{OctalDigit}{OctalDigit})
+SingleCharacter [^\'\]
+CharacterLiteral [\'][^\'\][\']
 /*-----------------------------*/
-StringCharacter [^\'\n]|{EscapeSequence}
+StringCharacter [^\'\n]
 StringLiteral ["]{StringCharacter}*["]
 /*-----------------------------*/
-TextBlockCharacter [^\\]|{EscapeSequence}|{LineTerminator}
+TextBlockCharacter [^\\]|{LineTerminator}
 TextBlockWhiteSpace " "|"\t"|"\f"
 TextBlock [\"]{3}{TextBlockWhiteSpace}*{LineTerminator}{TextBlockCharacter}*[\"]{3}
 /*-----------------------------*/
@@ -108,10 +105,17 @@ Separator "\("|"\)"|"\{"|"\}"|"\["|"\]"|";"|","|"."|"..."|"@"|"::"
 /*#############################*/
 Operator "="|">"|"<"|"!"|"~"|"?"|":"|"->"|"=="|">="|"<="|"!="|"&&"|"||"|"++"|"--"|"+"|"-"|"*"|"/"|"&"|"|"|"^"|"%"|"<<"|">>"|">>>"|"+="|"-="|"*="|"/="|"&="|"|="|"^="|"%="|"<<="|">>="|">>>="
 /*#############################*/
+Token {Identifier}|{Keyword}|{Literal}|{Separator}|{Operator}
+InputElement {WhiteSpace}|{Comment}|{Token}
+Input {InputElement}*
 
 %x COMMENT
 %%
 \n { yylineno++; }
+"/*" {BEGIN(COMMENT);cout << "comment starts at " << yylineno << endl;}
+<COMMENT>[^*\n]* { /* ignore everything within the comment */ }
+<COMMENT>[\n] {yylineno++;}
+<COMMENT>"*/" {cout << "comment ends at " << yylineno << endl;BEGIN(INITIAL);}
 {Keyword} AddLexeme(strdup(yytext),KEYWORD);
 {Literal} AddLexeme(strdup(yytext),LITERAL);
 {Separator} AddLexeme(strdup(yytext),SEPARATOR);
@@ -144,7 +148,7 @@ void PrintData()
     fout << "Lexeme,Token,Count" << endl;
     for(auto element:newData)
     {
-        fout << element.first << "," << tokenTable[element.second[0]] << "," << element.second[1] <<  endl;
+        fout << ((element.first==",")?"\",\"":element.first) << "," << tokenTable[element.second[0]] << "," << element.second[1] <<  endl;
     }
     fout.close();
 }

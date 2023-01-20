@@ -10,4 +10,5 @@ int main()
         cin >> str;
         cout  << "\"" << str << "\"|";
     }
+    cout << "/" << endl;
 }
