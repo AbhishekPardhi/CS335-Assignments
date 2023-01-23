@@ -4,7 +4,7 @@
 
     vector<string> tokenTable{"Keyword","Identifier","Separator","Operator","Literal"};
     enum Tokens{KEYWORD=0,IDENTIFIER=1,SEPARATOR=2,OPERATOR=3,LITERAL=4};
-    vector<string> errorTable{"Decimal numbers must have a digit before decimal."};
+    vector<string> errorTable{"Text Block can not have \\ in it."};
     unordered_map<string, vector<int>> table;
     int lexemeCount;
     char*file;
@@ -18,8 +18,9 @@
     void ReportError(int index);
 %}
 /*#############################*/
-LineTerminator "0x0A"|"0x0D"|"0x0A""0x0D"
+LineTerminator "\n"|"\r"|"\r\n"
 WhiteSpace " "|"\t"|"\f"|{LineTerminator}
+WS [ \t\f]
 /*#############################*/
 EndOfLineComment "//"[^\n]*
 NotStarNotSlash [^*/]|{LineTerminator}
@@ -43,7 +44,7 @@ Digit [0-9]
 Underscores [_]+
 DigitOrUnderscore {Digit}|[_]
 DigitsAndUnderscores {DigitOrUnderscore}+
-Digits {Digit}?|({Digit}{DigitsAndUnderscores}?{Digit})
+Digits {Digit}|({Digit}{DigitsAndUnderscores}?{Digit})
 DecimalNumeral [0]|({NonZeroDigit}{Digits}?)|({NonZeroDigit}{Underscores}{Digits})
 IntegerTypeSuffix [lL]
 DecimalIntegerLiteral ({DecimalNumeral}{IntegerTypeSuffix}?)
@@ -76,11 +77,11 @@ Sign [+-]
 SignedInteger {Sign}?{Digits}
 ExponentIndicator [eE]
 ExponentPart {ExponentIndicator}{SignedInteger}
-DecimalFloatingPointLiteral ({Digits}[.]{Digits}?{ExponentPart}?{FloatTypeSuffix}?)|([.]{Digits}{ExponentPart}?{FloatTypeSuffix}?)|({Digits}{ExponentPart}{FloatTypeSuffix}?)|({Digits}{ExponentPart}?{FloatTypeSuffix})
+DecimalFloatingPointLiteral ({Digits}[\.]{Digits}?{ExponentPart}?{FloatTypeSuffix}?)|([\.]{Digits}{ExponentPart}?{FloatTypeSuffix}?)|({Digits}{ExponentPart}{FloatTypeSuffix}?)|({Digits}{ExponentPart}?{FloatTypeSuffix})
 /*-----------------------------*/
 BinaryExponentIndicator [pP]
 BinaryExponent {BinaryExponentIndicator}{SignedInteger}
-HexSignificand ({HexNumeral}[.]?)|("0x"{HexDigits}?[.]{HexDigits})|("0X"{HexDigits}?[.]{HexDigits})
+HexSignificand ({HexNumeral}[\.]?)|("0x"{HexDigits}?[\.]{HexDigits})|("0X"{HexDigits}?[\.]{HexDigits})
 HexadecimalFloatingPointLiteral {HexSignificand}{BinaryExponent}{FloatTypeSuffix}?
 /*-----------------------------*/
 FloatingPointLiteral {DecimalFloatingPointLiteral}|{HexadecimalFloatingPointLiteral}
@@ -90,7 +91,7 @@ BooleanLiteral true|false
 SingleCharacter [^\'\]
 CharacterLiteral [\'][^\'\][\']
 /*-----------------------------*/
-StringCharacter [^\'\n]
+StringCharacter [^\"\n]
 StringLiteral ["]{StringCharacter}*["]
 /*-----------------------------*/
 TextBlockCharacter [^\\]|{LineTerminator}
@@ -99,7 +100,7 @@ TextBlock [\"]{3}{TextBlockWhiteSpace}*{LineTerminator}{TextBlockCharacter}*[\"]
 /*-----------------------------*/
 NullLiteral null
 /*-----------------------------*/
-Literal {IntegerLiteral}|{FloatingPointLiteral}|{BooleanLiteral}|{CharacterLiteral}|{StringLiteral}|{TextBlock}|{NullLiteral}
+Literal {IntegerLiteral}|{FloatingPointLiteral}|{BooleanLiteral}|{CharacterLiteral}|{StringLiteral}|{NullLiteral}
 /*#############################*/
 Separator "\("|"\)"|"\{"|"\}"|"\["|"\]"|";"|","|"."|"..."|"@"|"::"
 /*#############################*/
@@ -110,17 +111,25 @@ InputElement {WhiteSpace}|{Comment}|{Token}
 Input {InputElement}*
 
 %x COMMENT
+%x TEXTBLOCK
 %%
 \n { yylineno++; }
-"/*" {BEGIN(COMMENT);cout << "comment starts at " << yylineno << endl;}
-<COMMENT>[^*\n]* { /* ignore everything within the comment */ }
+"/*" {BEGIN(COMMENT);}
+<COMMENT>[^*\n]*
+<COMMENT>"*"+[^*/\n]*
 <COMMENT>[\n] {yylineno++;}
-<COMMENT>"*/" {cout << "comment ends at " << yylineno << endl;BEGIN(INITIAL);}
-{Keyword} AddLexeme(strdup(yytext),KEYWORD);
-{Literal} AddLexeme(strdup(yytext),LITERAL);
-{Separator} AddLexeme(strdup(yytext),SEPARATOR);
-{Operator} AddLexeme(strdup(yytext),OPERATOR);
-{Identifier} AddLexeme(strdup(yytext),IDENTIFIER);
+<COMMENT>"*/" {BEGIN(INITIAL);}
+"//"+.* 
+[\"]{3}{WS}*{LineTerminator} {BEGIN(TEXTBLOCK);yymore();}
+<TEXTBLOCK>[\"]{3} {AddLexeme(yytext,LITERAL);BEGIN(INITIAL);}
+<TEXTBLOCK>[\\] {ReportError(0);PrintData();return 0;}
+<TEXTBLOCK>[\n] {yylineno++;yymore();}
+<TEXTBLOCK>[\"]{0,2}+[^\"\n]* {yymore();}
+{Keyword} AddLexeme(yytext,KEYWORD);
+{Literal} AddLexeme(yytext,LITERAL);
+{Separator} AddLexeme(yytext,SEPARATOR);
+{Operator} AddLexeme(yytext,OPERATOR);
+{Identifier} AddLexeme(yytext,IDENTIFIER);
 . /*{cout << yytext << endl;}*/
 %%
 

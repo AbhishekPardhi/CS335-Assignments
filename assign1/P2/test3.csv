@@ -22,7 +22,7 @@ y,Identifier,2
 if,Keyword,1
 >,Operator,1
 System,Identifier,1
-.,Literal,2
+.,Separator,2
 out,Identifier,1
 println,Identifier,1
 "x is greater than y",Literal,1

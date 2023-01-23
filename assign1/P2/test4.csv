@@ -28,7 +28,7 @@ dVar,Identifier,4
 lVar,Identifier,2
 iVar,Identifier,2
 System,Identifier,2
-.,Literal,4
+.,Separator,4
 out,Identifier,2
 println,Identifier,2
 "Dummy print: ",Literal,1

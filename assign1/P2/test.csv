@@ -1,14 +1,1 @@
 Lexeme,Token,Count
-1e1f,Literal,1
-2.f,Literal,1
-.3f,Literal,1
-0f,Literal,1
-3.14f,Literal,1
-6.022137e+23f,Literal,1
-1e1,Literal,1
-2.,Literal,1
-.3,Literal,1
-0.0,Literal,1
-3.14,Literal,1
-1e-9d,Literal,1
-1e137,Literal,1

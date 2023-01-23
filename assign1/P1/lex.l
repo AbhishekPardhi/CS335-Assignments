@@ -30,7 +30,7 @@ LITERAL [-]?{DIGIT}+|[-]?{DIGIT}+"."{DIGIT}+
 
 %x COMMENT
 %%
-\n { yylineno++; }
+\n { yylineno++;}
 [^a-zA-Z0-9]\. {ReportError(0);PrintData();return 0;}
 "{" {BEGIN(COMMENT);cout << "comment starts at " << yylineno << endl;}
 <COMMENT>[^}\n]* { /* ignore everything within the comment */ }

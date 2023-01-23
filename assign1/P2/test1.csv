@@ -19,9 +19,9 @@ n,Identifier,4
 10,Literal,1
 ",",Separator,12
 c,Identifier,9
-d,Literal,10
+d,Identifier,10
 swap,Identifier,3
-;,Separator,14
+;,Separator,13
 array,Identifier,8
 new,Keyword,1
 23,Literal,1
@@ -42,9 +42,8 @@ for,Keyword,3
 if,Keyword,1
 >,Operator,1
 +,Operator,3
-3,Literal,1
 System,Identifier,2
-.,Literal,4
+.,Separator,4
 out,Identifier,2
 println,Identifier,2
-"Sorted list of numbers:",Literal,1
+"Sorted list of num'bers:",Literal,1
