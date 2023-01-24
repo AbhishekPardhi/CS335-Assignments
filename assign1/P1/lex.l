@@ -18,31 +18,35 @@
     void ReportError(int index);
 %}
 
-TYPE int|char|bool|float
 DIGIT [0-9]
 ID [a-zA-Z][a-zA-Z0-9]*
 ERROR ^{ID}"."
 OPERATOR "+"|"-"|"*"|"/"|"."|":="|"="|"<>"|"<"|"<="|">="|">"|"^"|"add"|"or"|"not"|"div"|"mod"|"in"
-STRING \"[^\"]+\"
-KEYWORD "array"|"begin"|"case"|"const"|"do"|"downto"|"else"|"end"|"file"|"for"|"function"|"goto"|"if"|"label"|"nil"|"of"|"packed"|"procedure"|"program"|"record"|"repeat"|"set"|"then"|"to"|"type"|"until"|"var"|"while"|"with"
-SEPARATOR ","|";"|":"|"("|")"|"["|"]"|".."
-LITERAL [-]?{DIGIT}+|[-]?{DIGIT}+"."{DIGIT}+
+STRING \"[^\"]*\"
+KEYWORD array|begin|case|const|do|downto|else|end|file|for|function|goto|if|label|nil|of|packed|procedure|program|record|repeat|set|then|to|type|until|var|while|with
+SEPARATOR ","|";"|":"|"("|")"|"["|"]"
+LITERAL ({DIGIT}+|([-]?{DIGIT}+"."{DIGIT}+))+([eE][+-]?{DIGIT}+)?
+WS [ \t\n\f]
 
 %x COMMENT
+%x PERIOD
+%option yylineno
 %%
-\n { yylineno++;}
-[^a-zA-Z0-9]\. {ReportError(0);PrintData();return 0;}
-"{" {BEGIN(COMMENT);cout << "comment starts at " << yylineno << endl;}
-<COMMENT>[^}\n]* { /* ignore everything within the comment */ }
-<COMMENT>[\n] {yylineno++;}
-<COMMENT>"}" {cout << "comment ends at " << yylineno << endl;BEGIN(INITIAL);}
-{KEYWORD} AddLexeme(strdup(yytext),KEYWORD);
-{OPERATOR} AddLexeme(strdup(yytext),OPERATOR);
-{ID} AddLexeme(strdup(yytext),IDENTIFIER);
-{LITERAL} AddLexeme(strdup(yytext),LITERAL);
-{SEPARATOR} AddLexeme(strdup(yytext),SEPARATOR);
-{STRING} AddLexeme(strdup(yytext),LITERAL);
-. /*Couldn't recognize lexeme*/;
+[^a-zA-Z0-9]\. {ReportError(0);PrintData();YY_FATAL_ERROR("Aborting...");}
+"{" {BEGIN(COMMENT);}
+<COMMENT>[^}]* { /* ignore everything within the comment */ }
+<COMMENT>"}" {BEGIN(INITIAL);}
+[\.] {BEGIN(PERIOD);yymore();}
+<PERIOD>[\.] {AddLexeme(yytext,SEPARATOR);BEGIN(INITIAL);}
+<PERIOD>[a-zA-Z0-9] {yyless(1);AddLexeme(yytext,OPERATOR);BEGIN(INITIAL);}
+{OPERATOR} AddLexeme(yytext,OPERATOR);
+{KEYWORD} AddLexeme(yytext,KEYWORD);
+{ID} AddLexeme(yytext,IDENTIFIER);
+{LITERAL} AddLexeme(yytext,LITERAL);
+{SEPARATOR} AddLexeme(yytext,SEPARATOR);
+{STRING} AddLexeme(yytext,LITERAL);
+{WS} /*ignore*/
+. {cerr << "Error: invalid character sequence: " << yytext << " at line: " << yylineno << endl; }
 %%
 
 void AddLexeme(string lexeme,int token)
@@ -76,7 +80,7 @@ void PrintData()
 
 void ReportError(int index)
 {
-    cout << "\033[31mCompilation error at line no." << yylineno << ": " << errorTable[index] << endl;
+    cerr << "\033[31mCompilation error at line no." << yylineno << ": " << errorTable[index] << endl;
 }
 
 int main(int argc, char*argv[]){

@@ -1,1 +1,5 @@
 Lexeme,Token,Count
+"""
+    a
+""" ,Literal,1
+3477,Literal,1

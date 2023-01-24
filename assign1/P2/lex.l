@@ -112,19 +112,17 @@ Input {InputElement}*
 
 %x COMMENT
 %x TEXTBLOCK
+%option yylineno
 %%
-\n { yylineno++; }
 "/*" {BEGIN(COMMENT);}
-<COMMENT>[^*\n]*
-<COMMENT>"*"+[^*/\n]*
-<COMMENT>[\n] {yylineno++;}
+<COMMENT>[^*]*
+<COMMENT>"*"+[^*/]*
 <COMMENT>"*/" {BEGIN(INITIAL);}
 "//"+.* 
 [\"]{3}{WS}*{LineTerminator} {BEGIN(TEXTBLOCK);yymore();}
-<TEXTBLOCK>[\"]{3} {AddLexeme(yytext,LITERAL);BEGIN(INITIAL);}
-<TEXTBLOCK>[\\] {ReportError(0);PrintData();return 0;}
-<TEXTBLOCK>[\n] {yylineno++;yymore();}
-<TEXTBLOCK>[\"]{0,2}+[^\"\n]* {yymore();}
+<TEXTBLOCK>[\"]{3}{WS}* {AddLexeme(yytext,LITERAL);BEGIN(INITIAL);}
+<TEXTBLOCK>[\\] {ReportError(0);PrintData();YY_FATAL_ERROR("Aborting...");}
+<TEXTBLOCK>[\"]{0,2}+[^\"]* {yymore();}
 {Keyword} AddLexeme(yytext,KEYWORD);
 {Literal} AddLexeme(yytext,LITERAL);
 {Separator} AddLexeme(yytext,SEPARATOR);
@@ -157,7 +155,7 @@ void PrintData()
     fout << "Lexeme,Token,Count" << endl;
     for(auto element:newData)
     {
-        fout << ((element.first==",")?"\",\"":element.first) << "," << tokenTable[element.second[0]] << "," << element.second[1] <<  endl;
+        fout << element.first << "," << tokenTable[element.second[0]] << "," << element.second[1] <<  endl;
     }
     fout.close();
 }
