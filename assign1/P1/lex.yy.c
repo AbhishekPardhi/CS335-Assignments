@@ -575,8 +575,8 @@ static int yy_more_len = 0;
 #define YY_MORE_ADJ (yy_more_len)
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "lex.l"
-#line 2 "lex.l"
+#line 1 "lex_1.l"
+#line 2 "lex_1.l"
     #include <bits/stdc++.h>
     using namespace std;
 
@@ -815,7 +815,7 @@ YY_DECL
 		}
 
 	{
-#line 34 "lex.l"
+#line 34 "lex_1.l"
 
 #line 821 "lex.yy.c"
 
@@ -893,85 +893,85 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 35 "lex.l"
+#line 35 "lex_1.l"
 {cout << yytext<<endl;ReportError(0);PrintData();YY_FATAL_ERROR("Aborting...");}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 36 "lex.l"
+#line 36 "lex_1.l"
 {BEGIN(COMMENT);}
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 37 "lex.l"
+#line 37 "lex_1.l"
 /* ignore everything within the comment */
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 38 "lex.l"
+#line 38 "lex_1.l"
 {BEGIN(INITIAL);}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 39 "lex.l"
+#line 39 "lex_1.l"
 {BEGIN(PERIOD);yymore();}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 40 "lex.l"
+#line 40 "lex_1.l"
 {AddLexeme(yytext,SEPARATOR);BEGIN(INITIAL);}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 41 "lex.l"
+#line 41 "lex_1.l"
 {yyless(1);AddLexeme(yytext,OPERATOR);BEGIN(INITIAL);}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 42 "lex.l"
+#line 42 "lex_1.l"
 AddLexeme(yytext,OPERATOR);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 43 "lex.l"
+#line 43 "lex_1.l"
 AddLexeme(yytext,KEYWORD);
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 44 "lex.l"
+#line 44 "lex_1.l"
 AddLexeme(yytext,IDENTIFIER);
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 45 "lex.l"
+#line 45 "lex_1.l"
 AddLexeme(yytext,LITERAL);
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 46 "lex.l"
+#line 46 "lex_1.l"
 AddLexeme(yytext,SEPARATOR);
 	YY_BREAK
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 47 "lex.l"
+#line 47 "lex_1.l"
 AddLexeme(yytext,LITERAL);
 	YY_BREAK
 case 14:
 /* rule 14 can match eol */
 YY_RULE_SETUP
-#line 48 "lex.l"
+#line 48 "lex_1.l"
 /*ignore*/
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 49 "lex.l"
+#line 49 "lex_1.l"
 {cerr << "Error: invalid character sequence: " << yytext << " at line: " << yylineno << endl; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 50 "lex.l"
+#line 50 "lex_1.l"
 ECHO;
 	YY_BREAK
 #line 978 "lex.yy.c"
@@ -1993,7 +1993,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 50 "lex.l"
+#line 50 "lex_1.l"
 
 
 void AddLexeme(string lexeme,int token)
