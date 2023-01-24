@@ -167,6 +167,11 @@ void ReportError(int index)
 
 int main(int argc, char*argv[]){
     lexemeCount=0;
+    if(argc<2)
+    {
+        cerr << "You must provide a .csv file as input to the command." << endl;
+        return 0;
+    }
     file=argv[1];
     yylex();
     PrintData();

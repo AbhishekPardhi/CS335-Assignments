@@ -32,9 +32,9 @@ WS [ \t\n\f]
 %x PERIOD
 %option yylineno
 %%
-[^a-zA-Z0-9]\. {ReportError(0);PrintData();YY_FATAL_ERROR("Aborting...");}
+[^a-zA-Z0-9\.]\. {cout << yytext<<endl;ReportError(0);PrintData();YY_FATAL_ERROR("Aborting...");}
 "{" {BEGIN(COMMENT);}
-<COMMENT>[^}]* { /* ignore everything within the comment */ }
+<COMMENT>[^}]* /* ignore everything within the comment */
 <COMMENT>"}" {BEGIN(INITIAL);}
 [\.] {BEGIN(PERIOD);yymore();}
 <PERIOD>[\.] {AddLexeme(yytext,SEPARATOR);BEGIN(INITIAL);}
@@ -85,6 +85,11 @@ void ReportError(int index)
 
 int main(int argc, char*argv[]){
     lexemeCount=0;
+    if(argc<2)
+    {
+        cerr << "You must provide a .csv file as input to the command." << endl;
+        return 0;
+    }
     file=argv[1];
     yylex();
     PrintData();
